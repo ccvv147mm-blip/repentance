@@ -34,9 +34,8 @@ jobs:
       run: |
         mkdir -p dist
 
-    - name: Initialize Capacitor and Add Android
+    - name: Add Android Platform and Sync
       run: |
-        npx cap init "وَصْلُ" "com.wasl.receipt" --web-dir dist --yes || true
         npx cap add android || true
         npx cap sync android
 
