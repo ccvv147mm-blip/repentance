@@ -1,0 +1,200 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  Outlet,
+  Link,
+  createRootRouteWithContext,
+  useRouter,
+  HeadContent,
+  Scripts,
+} from "@tanstack/react-router";
+import { useEffect } from "react";
+
+import appCss from "../styles.css?url";
+import { AuthProvider } from "@/lib/auth-context";
+import { Toaster } from "@/components/ui/sonner";
+import { ErrorCatcher } from "@/components/ErrorCatcher";
+import { MediaLock } from "@/components/MediaLock";
+import { I18nProvider } from "@/lib/i18n";
+
+function RemoveLovableBadge() {
+  useEffect(() => {
+    const selectors = [
+      '[data-lovable]',
+      '[class*="lovable"]',
+      '[id*="lovable"]',
+      'iframe[src*="lovable"]',
+      '[aria-label*="Lovable"]',
+      '[title*="Lovable"]',
+    ];
+    const remove = () => {
+      selectors.forEach((sel) => {
+        document.querySelectorAll(sel).forEach((el) => el.remove());
+      });
+    };
+    remove();
+    const obs = new MutationObserver(remove);
+    obs.observe(document.body, { childList: true, subtree: true });
+    return () => obs.disconnect();
+  }, []);
+  return null;
+}
+
+function NotFoundComponent() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="max-w-md text-center">
+        <h1 className="text-7xl font-bold text-foreground">٤٠٤</h1>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">الصفحة غير موجودة</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          الصفحة التي تبحث عنها غير موجودة أو تم نقلها.
+        </p>
+        <div className="mt-6">
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            الصفحة الرئيسية
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
+  console.error(error);
+  const router = useRouter();
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="max-w-md text-center">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">حدث خطأ ما</h1>
+        <p className="mt-2 text-sm text-muted-foreground">تعذّر تحميل الصفحة. يرجى المحاولة مرة أخرى.</p>
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
+          <button
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          >
+            إعادة المحاولة
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  head: () => ({
+    meta: [
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { title: "وَصْل — شبكة عربية مدعومة بالذكاء الاصطناعي" },
+      {
+        name: "description",
+        content: "وَصْل شبكة تواصل عربية مدعومة بالذكاء الاصطناعي: انشر منشوراتك وفيديوهاتك، تابع أخبار بلدك، تسوّق من المتجر، واربح من تفاعل متابعيك.",
+      },
+      { property: "og:title", content: "وَصْل — شبكة عربية مدعومة بالذكاء الاصطناعي" },
+      {
+        property: "og:description",
+        content: "شبكة تواصل عربية بالذكاء الاصطناعي: منشورات وفيديوهات وأخبار بلدك ومتجر للسلع والخدمات ونظام نقاط وهدايا وأرباح للمبدعين.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "وَصْل" },
+      { name: "twitter:title", content: "وَصْل — شبكة عربية مدعومة بالذكاء الاصطناعي" },
+      {
+        name: "twitter:description",
+        content: "شبكة تواصل عربية بالذكاء الاصطناعي: منشورات وفيديوهات وأخبار بلدك ومتجر للسلع والخدمات ونظام نقاط وهدايا وأرباح للمبدعين.",
+      },
+      { property: "og:image", content: "https://arabsparkcommunity.app/og-cover.jpg" },
+      { name: "twitter:image", content: "https://arabsparkcommunity.app/og-cover.jpg" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "theme-color", content: "#1877F2" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "وَصْل" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "google-site-verification", content: "P-yV17Sr4PhPAkEpkEBIp9fWJKdUEVezt1erVTw7ok0" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "WebSite",
+              "@id": "https://arabsparkcommunity.app/#website",
+              name: "وَصْل",
+              alternateName: "Wasl",
+              url: "https://arabsparkcommunity.app/",
+              inLanguage: "ar",
+              description:
+                "شبكة تواصل عربية مدعومة بالذكاء الاصطناعي: منشورات وفيديوهات وأخبار ومتجر ونظام نقاط وهدايا.",
+              publisher: { "@id": "https://arabsparkcommunity.app/#organization" },
+              potentialAction: {
+                "@type": "SearchAction",
+                target: "https://arabsparkcommunity.app/search?q={search_term_string}",
+                "query-input": "required name=search_term_string",
+              },
+            },
+            {
+              "@type": "Organization",
+              "@id": "https://arabsparkcommunity.app/#organization",
+              name: "وَصْل",
+              url: "https://arabsparkcommunity.app/",
+              logo: "https://arabsparkcommunity.app/icon-512.png",
+            },
+          ],
+        }),
+      },
+    ],
+
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.json" },
+      { rel: "icon", href: "/icon-192.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Roboto:wght@400;500;600;700&display=swap",
+      },
+    ],
+  }),
+  shellComponent: RootShell,
+  component: RootComponent,
+  notFoundComponent: NotFoundComponent,
+  errorComponent: ErrorComponent,
+});
+
+function RootShell({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="ar" dir="rtl">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        {children}
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+function RootComponent() {
+  const { queryClient } = Route.useRouteContext();
+  return (
+    <QueryClientProvider client={queryClient}>
+      <I18nProvider>
+        <AuthProvider>
+          <RemoveLovableBadge />
+          <MediaLock />
+          <Outlet />
+          <ErrorCatcher />
+          <Toaster position="top-center" richColors />
+        </AuthProvider>
+      </I18nProvider>
+    </QueryClientProvider>
+  );
+}
