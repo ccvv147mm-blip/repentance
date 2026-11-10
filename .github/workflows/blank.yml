@@ -26,23 +26,35 @@ jobs:
     - name: Install Dependencies
       run: npm install || true
 
-    - name: Setup Web Assets & Clean Android
+    - name: Organize Surface Files for Capacitor & Android
       run: |
+        # إنشاء مجلدات التشغيل القياسية لو لم تكن موجودة
         mkdir -p dist
-        cp -R src/* dist/ || true
+        mkdir -p android/app/src/main/assets/public
+
+        # جمع الملفات السطحية ونسخها لمجلد الويب والأصول
+        cp -R *.tsx dist/ || true
+        cp -R *.ts dist/ || true
+        cp -R *.js dist/ || true
+        cp -R *.json dist/ || true
+        
+        # التأكد من وجود ملف انطلاق رئيسي
         if [ ! -f dist/index.html ]; then
-          echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>وَصْلُ</title></head><body><div id="root"></div></body></html>' > dist/index.html
+          if [ -f index.html ]; then
+            cp index.html dist/index.html
+          else
+            echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>وَصْلُ</title></head><body><div id="root"></div></body></html>' > dist/index.html
+          fi
         fi
 
-        # إعادة تهيئة مجلد الأندرويد نظيفاً لضمان ربط كاباسيتور بشكل صحيح
-        rm -rf android
-        npx cap add android
-        npx cap update android
-
-    - name: Copy Files to Android Assets
-      run: |
-        mkdir -p android/app/src/main/assets/public
+        # نسخ محتوى dist مباشرة إلى أصول الأندرويد لضمان عمل التطبيق كـ Native App
         cp -rf dist/* android/app/src/main/assets/public/ || true
+
+    - name: Initialize Android Platform Safely
+      run: |
+        # تهيئة كاباسيتور وتحديث النظام بدون أخطاء مفقودة
+        npx cap add android || true
+        npx cap update android || true
 
     - name: Build Debug APK
       run: |
