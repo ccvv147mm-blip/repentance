@@ -26,7 +26,7 @@ jobs:
     - name: Install Dependencies
       run: npm install || true
 
-    - name: Setup Web Assets and Capacitor Android
+    - name: Setup Web Assets & Clean Android
       run: |
         mkdir -p dist
         cp -R src/* dist/ || true
@@ -34,16 +34,10 @@ jobs:
           echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>وَصْلُ</title></head><body><div id="root"></div></body></html>' > dist/index.html
         fi
 
-        # إنشاء أو تحديث مجلد الأندرويد وملفات الإعدادات الناقصة
-        npx cap add android || true
-        npx cap update android || true
-
-    - name: Ensure Capacitor Settings Exist
-      run: |
-        # التأكد من وجود ملف الإعدادات المطلوب لكي لا يفشل Gradle
-        if [ ! -f android/capacitor.settings.gradle ]; then
-          echo "// Auto-generated capacitor settings" > android/capacitor.settings.gradle
-        fi
+        # إعادة تهيئة مجلد الأندرويد نظيفاً لضمان ربط كاباسيتور بشكل صحيح
+        rm -rf android
+        npx cap add android
+        npx cap update android
 
     - name: Copy Files to Android Assets
       run: |
