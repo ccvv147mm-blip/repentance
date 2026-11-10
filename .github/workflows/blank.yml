@@ -26,20 +26,19 @@ jobs:
     - name: Install Dependencies
       run: npm install
 
-    - name: Build Web Application
-      run: |
-        npm run build || npx vite build || true
-
-    - name: Ensure Dist Directory Exists
+    - name: Prepare Web Assets Directory
       run: |
         mkdir -p dist
+        # نسخ الملفات الأساسية لداخل مجلد dist ليجدها كاباسيتور فوراً
+        cp -R src/* dist/ || true
+        touch dist/index.html
 
     - name: Add Android Platform and Sync
       run: |
         npx cap add android || true
         npx cap sync android
 
-    - name: Copy Web Assets to Android
+    - name: Copy Assets to Android Project
       run: |
         mkdir -p android/app/src/main/assets/public
         cp -rf dist/* android/app/src/main/assets/public/ || true
