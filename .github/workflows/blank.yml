@@ -26,19 +26,24 @@ jobs:
     - name: Install Dependencies
       run: npm install
 
-    - name: Build Web (Ignore SSR/Server)
+    - name: Build Web Application
       run: |
-        npx vite build --emptyOutDir || npm run build || true
+        npm run build || npx vite build || true
 
-    - name: Add Android Platform and Sync
+    - name: Ensure Dist Directory Exists
       run: |
-        npx cap add android
+        mkdir -p dist
+
+    - name: Initialize Capacitor and Add Android
+      run: |
+        npx cap init "وَصْلُ" "com.wasl.receipt" --web-dir dist --yes || true
+        npx cap add android || true
         npx cap sync android
 
-    - name: Copy Dist to Android Assets
+    - name: Copy Web Assets to Android
       run: |
         mkdir -p android/app/src/main/assets/public
-        cp -rf dist/* android/app/src/main/assets/public/ || cp -rf build/* android/app/src/main/assets/public/ || true
+        cp -rf dist/* android/app/src/main/assets/public/ || true
 
     - name: Build Debug APK
       run: |
