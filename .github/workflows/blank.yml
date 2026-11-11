@@ -26,35 +26,27 @@ jobs:
     - name: Install Dependencies
       run: npm install || true
 
-    - name: Organize Surface Files for Capacitor & Android
+    - name: Force Create Android & Setup Assets
       run: |
-        # إنشاء مجلدات التشغيل القياسية لو لم تكن موجودة
         mkdir -p dist
-        mkdir -p android/app/src/main/assets/public
-
-        # جمع الملفات السطحية ونسخها لمجلد الويب والأصول
+        # جمع الملفات السطحية
         cp -R *.tsx dist/ || true
         cp -R *.ts dist/ || true
         cp -R *.js dist/ || true
         cp -R *.json dist/ || true
         
-        # التأكد من وجود ملف انطلاق رئيسي
         if [ ! -f dist/index.html ]; then
-          if [ -f index.html ]; then
-            cp index.html dist/index.html
-          else
-            echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>وَصْلُ</title></head><body><div id="root"></div></body></html>' > dist/index.html
-          fi
+          echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>وَصْلُ</title></head><body><div id="root"></div></body></html>' > dist/index.html
         fi
 
-        # نسخ محتوى dist مباشرة إلى أصول الأندرويد لضمان عمل التطبيق كـ Native App
-        cp -rf dist/* android/app/src/main/assets/public/ || true
+        # إزالة أي مجلد أندرويد قديم تالف وإعادة إنشائه بنجاح لضمان وجود gradlew
+        rm -rf android
+        npx cap add android
+        npx cap update android
 
-    - name: Initialize Android Platform Safely
-      run: |
-        # تهيئة كاباسيتور وتحديث النظام بدون أخطاء مفقودة
-        npx cap add android || true
-        npx cap update android || true
+        # نسخ الملفات إلى أصول أندرويد
+        mkdir -p android/app/src/main/assets/public
+        cp -rf dist/* android/app/src/main/assets/public/ || true
 
     - name: Build Debug APK
       run: |
