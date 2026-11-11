@@ -1,6 +1,6 @@
 {
-  "name": "وَصْل — شبكة عربية ذكية",
-  "short_name": "وَصْل",
+  "name": "وصل - شبكة عربية ذكية",
+  "short_name": "وصل",
   "description": "شبكة تواصل اجتماعي عربية مدعومة بالذكاء الاصطناعي",
   "start_url": "/",
   "scope": "/",
@@ -8,7 +8,7 @@
   "display_override": ["fullscreen", "standalone"],
   "orientation": "portrait",
   "background_color": "#ffffff",
-  "theme_color": "#1877F2",
+  "theme_color": "#1677F2",
   "lang": "ar",
   "dir": "rtl",
   "categories": ["social", "communication"],
