@@ -26,10 +26,9 @@ jobs:
     - name: Install Dependencies
       run: npm install || true
 
-    - name: Force Create Android & Setup Assets
+    - name: Setup Web Assets & Directory Structure
       run: |
         mkdir -p dist
-        # جمع الملفات السطحية
         cp -R *.tsx dist/ || true
         cp -R *.ts dist/ || true
         cp -R *.js dist/ || true
@@ -39,14 +38,16 @@ jobs:
           echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>وَصْلُ</title></head><body><div id="root"></div></body></html>' > dist/index.html
         fi
 
-        # إزالة أي مجلد أندرويد قديم تالف وإعادة إنشائه بنجاح لضمان وجود gradlew
+        # إنشاء مسار الأصول المفقود مسبقاً لمنع أي خطأ ENOENT
+        mkdir -p android/app/src/main/assets/public
+
+    - name: Initialize & Update Android Cleanly
+      run: |
         rm -rf android
         npx cap add android
-        npx cap update android
-
-        # نسخ الملفات إلى أصول أندرويد
-        mkdir -p android/app/src/main/assets/public
+        # نسخ ملفات الويب فوراً بعد إضافة المنصة
         cp -rf dist/* android/app/src/main/assets/public/ || true
+        npx cap update android || true
 
     - name: Build Debug APK
       run: |
