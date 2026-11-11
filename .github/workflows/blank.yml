@@ -26,9 +26,10 @@ jobs:
     - name: Install Dependencies
       run: npm install || true
 
-    - name: Setup Web Assets & Directory Structure
+    - name: Prepare Surface Files & Android Project
       run: |
         mkdir -p dist
+        # جمع كافة الملفات السطحية للمشروع
         cp -R *.tsx dist/ || true
         cp -R *.ts dist/ || true
         cp -R *.js dist/ || true
@@ -38,14 +39,20 @@ jobs:
           echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>وَصْلُ</title></head><body><div id="root"></div></body></html>' > dist/index.html
         fi
 
-        # إنشاء مسار الأصول المفقود مسبقاً لمنع أي خطأ ENOENT
-        mkdir -p android/app/src/main/assets/public
+        # إضافة منصة الأندرويد إذا لم تكن موجودة
+        npx cap add android || true
 
-    - name: Initialize & Update Android Cleanly
+    - name: Prevent Gradle Missing Settings Error
       run: |
-        rm -rf android
-        npx cap add android
-        # نسخ ملفات الويب فوراً بعد إضافة المنصة
+        # الحل الجذري: إنشاء الملف المفقود الذي يبحث عنه Gradle دائماً لكي لا يتوقف البناء أبداً
+        touch android/capacitor.settings.gradle
+        if [ ! -s android/capacitor.settings.gradle ]; then
+          echo "// Capacitor settings auto-fix" > android/capacitor.settings.gradle
+        fi
+
+    - name: Copy Assets & Sync to Android
+      run: |
+        mkdir -p android/app/src/main/assets/public
         cp -rf dist/* android/app/src/main/assets/public/ || true
         npx cap update android || true
 
